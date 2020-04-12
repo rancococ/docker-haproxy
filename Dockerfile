@@ -57,6 +57,11 @@ RUN set -x \
     && cp -R /usr/src/haproxy/examples/errorfiles /usr/local/etc/haproxy/errors \
     && rm -rf /usr/src/haproxy \
     \
+    && curl --create-dirs -fsSLo /usr/local/bin/gotmpl "${GOTMPL_URL}" \
+    && chmod +x /usr/local/bin/gotmpl \
+    && chmod +x /docker-entrypoint.sh \
+    && chmod +x /haproxy-setup.sh \
+    \
     && apt-mark auto '.*' > /dev/null \
     && { [ -z "$savedAptMark" ] || apt-mark manual $savedAptMark; } \
     && find /usr/local -type f -executable -exec ldd '{}' ';' \
@@ -66,11 +71,7 @@ RUN set -x \
         | cut -d: -f1 \
         | sort -u \
         | xargs -r apt-mark manual \
-    && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
-    && curl --create-dirs -fsSLo /usr/local/bin/gotmpl "${GOTMPL_URL}" \
-    && chmod +x /usr/local/bin/gotmpl \
-    && chmod +x /docker-entrypoint.sh \
-    && chmod +x /haproxy-setup.sh
+    && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false
 
 # https://www.haproxy.org/download/1.8/doc/management.txt
 # "4. Stopping and restarting HAProxy"
