@@ -27,6 +27,7 @@ RUN set -x \
         libpcre2-dev \
         libssl-dev \
         make \
+        curl \
         wget \
         zlib1g-dev \
     && rm -rf /var/lib/apt/lists/* \
