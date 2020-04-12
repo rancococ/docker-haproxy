@@ -1,17 +1,17 @@
-#!/bin/sh
+#!/bin/bash
+
 set -e
 
-# first arg is `-f` or `--some-option`
-if [ "${1#-}" != "$1" ]; then
-	set -- haproxy "$@"
+# exec haproxy-setup.sh
+if [ -x "/haproxy-setup.sh" ]; then
+    . "/haproxy-setup.sh"
 fi
 
-if [ "$1" = 'haproxy' ]; then
-	shift # "haproxy"
-	# if the user wants "haproxy", let's add a couple useful flags
-	#   -W  -- "master-worker mode" (similar to the old "haproxy-systemd-wrapper"; allows for reload via "SIGUSR2")
-	#   -db -- disables background mode
-	set -- haproxy -W -db "$@"
+# current user is root
+if [ "$(id -u)" = "0" ]; then
+    # start haproxy
+    exec /usr/local/sbin/haproxy -f /usr/local/etc/haproxy/haproxy.cfg -W -db ${HAPROXY_COMMAND_LINE_ARGUMENTS}
 fi
 
+# exec some command
 exec "$@"
