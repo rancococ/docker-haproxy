@@ -4,9 +4,14 @@
 # Global settings
 #---------------------------------------------------------------------
 global
-    maxconn  {{- with .maxconn}}{{.}}{{else}}20000{{- end}}
-    ulimit-n {{- with .ulimit}}{{.}}{{else}}41000{{- end}}
-    nbproc   {{- with .nbproc}}{{.}}{{else}}4{{- end}}
+    log     127.0.0.1 local0 #[err warning info debug]
+    maxconn  {{with .maxconn}}{{.}}{{else}}20000{{end}}
+    ulimit-n {{with .ulimit}}{{.}}{{else}}41000{{end}}
+    nbproc   {{with .nbproc}}{{.}}{{else}}4{{end}}
+    cpu-map 1 0
+    cpu-map 2 1
+    cpu-map 3 2
+    cpu-map 4 3
     daemon
     tune.ssl.default-dh-param 2048
 
@@ -42,7 +47,8 @@ defaults
 # admin_status monitor
 #---------------------------------------------------------------------
 listen admin_status
-    bind  *:{{- with .statsport}}{{.}}{{else}}9000{{- end}}
+    bind  *:{{with .statsport}}{{.}}{{else}}9000{{end}}
+    bind-process 1
     mode  http
     stats refresh 10s
     stats enable
@@ -65,6 +71,7 @@ listen admin_status
 frontend frontend_webserver01
     bind            *:8080
     bind            *:8443 ssl crt /usr/local/etc/haproxy/server.pem
+    bind-process    4
     mode            http
     log             global
     option          httplog

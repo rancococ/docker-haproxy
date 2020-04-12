@@ -16,7 +16,7 @@ if [ ! -e "${HAPROXY_CONF}" ]; then
         echo ""
         echo generate ${HAPROXY_JSON}
         touch ${HAPROXY_JSON}
-        printf "${HAPROXY_JSONTEMP}" > ${HAPROXY_JSON}
+        printf "${HAPROXY_JSONTEMP}\n" > ${HAPROXY_JSON}
         echo "generate ${HAPROXY_JSON} success."
         cat ${HAPROXY_JSON}
         echo ""
@@ -24,7 +24,9 @@ if [ ! -e "${HAPROXY_CONF}" ]; then
         gotmpl --template="f:${HAPROXY_TMPL}" --jsondata="f:${HAPROXY_JSON}" --outfile="${HAPROXY_CONF}"
         chmod 644 ${HAPROXY_CONF}
         echo "generate ${HAPROXY_CONF} success."
+        echo ""
         cat ${HAPROXY_CONF}
+        echo ""
         echo "remove temp file"
         #\rm -rf ${HAPROXY_JSON}
         echo ""
