@@ -13,7 +13,6 @@ ENV GOTMPL_URL=https://github.com/rancococ/gotmpl/releases/download/v1.0.2/gotmp
 # copy script
 COPY docker-entrypoint.sh /
 COPY haproxy-setup.sh /
-COPY haproxy.tmpl /usr/local/etc/haproxy/
 
 # see https://sources.debian.net/src/haproxy/jessie/debian/rules/ for some helpful navigation of the possible "make" arguments
 RUN set -x \
