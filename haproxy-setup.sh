@@ -26,7 +26,7 @@ if [ ! -e "${HAPROXY_CONF}" ]; then
             echo "generate ${HAPROXY_CONF_FILE} success."
         else
             # haproxy.json does not exist
-            echo "haproxy.json does not exist"
+            echo "${HAPROXY_JSON_FILE} does not exist"
             if [ -e "${HAPROXY_TEMP_FILE}" ] ; then
                 echo "${HAPROXY_TEMP_FILE} is exist"
                 # generate haproxy.json from haproxy.temp
@@ -50,7 +50,7 @@ if [ ! -e "${HAPROXY_CONF}" ]; then
                 chmod 644 ${HAPROXY_CONF_FILE}
                 echo "generate ${HAPROXY_CONF_FILE} success."
             else
-                echo "haproxy.temp does not exist"
+                echo "${HAPROXY_TEMP_FILE} does not exist"
             fi
         fi
         if [ -e "${HAPROXY_CONF_FILE}" ] ; then
@@ -60,11 +60,11 @@ if [ ! -e "${HAPROXY_CONF}" ]; then
             cat ${HAPROXY_CONF_FILE}
             echo "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
         else
-            echo "haproxy.cfg does not exist"
+            echo "${HAPROXY_CONF_FILE} does not exist"
             exit 1
         fi
     else
-        echo "haproxy.tmpl does not exist"
+        echo "${HAPROXY_TMPL_FILE} does not exist"
         exit 1
     fi
 fi
