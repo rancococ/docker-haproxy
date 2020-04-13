@@ -2,36 +2,69 @@
 
 set -e
 
-HAPROXY_TMPL="/usr/local/etc/haproxy/haproxy.tmpl"
-HAPROXY_JSON="/usr/local/etc/haproxy/haproxy.json"
-HAPROXY_CONF="/usr/local/etc/haproxy/haproxy.cfg"
+HAPROXY_TMPL_FILE="/usr/local/etc/haproxy/haproxy.tmpl"
+HAPROXY_TEMP_FILE="/usr/local/etc/haproxy/haproxy.temp"
+HAPROXY_JSON_FILE="/usr/local/etc/haproxy/haproxy.json"
+HAPROXY_CONF_FILE="/usr/local/etc/haproxy/haproxy.cfg"
 
 # automatically generated when haproxy.cfg does not exist
 if [ ! -e "${HAPROXY_CONF}" ]; then
     echo "the container first start."
-    # generate haproxy.cfg from env
-    if [ -n "${HAPROXY_JSONDATA}" ] && [ -e "${HAPROXY_TMPL}" ] ; then
-        echo generate haproxy.cfg from env and haproxy.tmpl
-        eval "printf -v HAPROXY_JSONTEMP \"${HAPROXY_JSONDATA}\""
+    # generate haproxy.cfg from env, haproxy.json, haproxy.temp, haproxy.tmpl
+    if [ -e "${HAPROXY_TMPL_FILE}" ] ; then
+        echo generate haproxy.cfg from env, haproxy.json, haproxy.temp, haproxy.tmpl
         echo ""
-        echo generate ${HAPROXY_JSON}
-        touch ${HAPROXY_JSON}
-        printf "${HAPROXY_JSONTEMP}\n" > ${HAPROXY_JSON}
-        echo "generate ${HAPROXY_JSON} success."
-        cat ${HAPROXY_JSON}
+        if [ -e "${HAPROXY_JSON_FILE}" ] ; then
+            # haproxy.json is exist
+            echo "haproxy.json is exist"
+            echo ""
+            cat ${HAPROXY_JSON_FILE}
+            echo ""
+            echo generate ${HAPROXY_CONF_FILE}
+            gotmpl --template="f:${HAPROXY_TMPL_FILE}" --jsondata="f:${HAPROXY_JSON_FILE}" --outfile="${HAPROXY_CONF_FILE}"
+            chmod 644 ${HAPROXY_CONF_FILE}
+            echo "generate ${HAPROXY_CONF_FILE} success."
+        else
+            # haproxy.json does not exist
+            echo "haproxy.json does not exist"
+            echo ""
+            if [ -e "${HAPROXY_TEMP_FILE}" ] ; then
+                echo "haproxy.temp is exist"
+                echo ""
+                # generate haproxy.json from haproxy.temp
+                echo "read ${HAPROXY_TEMP_FILE}"
+                HAPROXY_TEMP_DATA=$(cat ${HAPROXY_TEMP_FILE})
+                echo ""
+                echo "${HAPROXY_TEMP_DATA}"
+                eval "printf -v HAPROXY_JSON_DATA \"${HAPROXY_TEMP_DATA}\""
+                echo ""
+                echo generate ${HAPROXY_JSON_FILE}
+                touch ${HAPROXY_JSON_FILE}
+                printf "${HAPROXY_JSON_DATA}" > ${HAPROXY_JSON_FILE}
+                echo ""
+                echo "generate ${HAPROXY_JSON_FILE} success."
+                echo ""
+                cat ${HAPROXY_JSON_FILE}
+                echo ""
+                echo generate ${HAPROXY_CONF_FILE}
+                gotmpl --template="f:${HAPROXY_TMPL_FILE}" --jsondata="f:${HAPROXY_JSON_FILE}" --outfile="${HAPROXY_CONF_FILE}"
+                chmod 644 ${HAPROXY_CONF_FILE}
+                echo "generate ${HAPROXY_CONF_FILE} success."
+            else
+                echo "haproxy.temp does not exist"
+            fi
+        fi
         echo ""
-        echo generate ${HAPROXY_CONF}
-        gotmpl --template="f:${HAPROXY_TMPL}" --jsondata="f:${HAPROXY_JSON}" --outfile="${HAPROXY_CONF}"
-        chmod 644 ${HAPROXY_CONF}
-        echo "generate ${HAPROXY_CONF} success."
-        echo ""
-        cat ${HAPROXY_CONF}
-        echo ""
-        echo "remove temp file"
-        #\rm -rf ${HAPROXY_JSON}
+        if [ -e "${HAPROXY_CONF_FILE}" ] ; then
+            # show haproxy.cfg
+            cat ${HAPROXY_CONF_FILE}
+        else
+            echo "haproxy.cfg does not exist"
+            exit 1
+        fi
         echo ""
     else
-        echo "HAPROXY_JSONDATA is empty or haproxy.tmpl does not exist"
-        echo ""
+        echo "haproxy.tmpl does not exist"
+        exit 1
     fi
 fi
