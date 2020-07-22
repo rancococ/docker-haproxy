@@ -8,7 +8,7 @@ HAPROXY_JSON_FILE="/usr/local/etc/haproxy/haproxy.json"
 HAPROXY_CONF_FILE="/usr/local/etc/haproxy/haproxy.cfg"
 
 # automatically generated when haproxy.cfg does not exist
-if [ ! -e "${HAPROXY_CONF}" ]; then
+if [ ! -e "${HAPROXY_CONF_FILE}" ]; then
     echo "the container first start."
     # generate haproxy.cfg from env, haproxy.json, haproxy.temp, haproxy.tmpl
     if [ -e "${HAPROXY_TMPL_FILE}" ] ; then
